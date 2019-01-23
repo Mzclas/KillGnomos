@@ -2,7 +2,7 @@ function Background(game) {
   this.game = game;
 
   this.img = new Image();
-  this.img.src = "./imgs/Terror-La-casa-del-jardín1.jpg";
+  this.img.src = "./imgs/85cdca8088322c299b99cde3a64807ae.jpg";
 
   this.x = 0;
   this.y = 0;

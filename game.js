@@ -2,15 +2,20 @@ var Game = {
   canvas: undefined,
   ctx: undefined,
   fps: 60,
-
-  start: function(canvasId) {
+  startGame: function(canvasId) {
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext("2d");
+    this.click();
     this.fps = 60;
+    this.reset();
+    this.start();
+    this.contGnomos = 0;
+    this.maxGnomos = 10;
+  },
+  start: function() {
     this.clickX = undefined;
     this.clickY = undefined;
     this.framesCounter = 0;
-    this.reset();
     console.log(this.canvas.width);
     this.ugeInterval = setInterval(
       function() {
@@ -27,7 +32,6 @@ var Game = {
         // cree gnomos cada cierto tiempo ,  this.gnomos.push(new Gnomo (this))
         // mueva los elementos si se mueven
         // pinte
-        this.click();
         // recoja si hay click de raton
         // elimine gnomos destruidos.
       }.bind(this),
@@ -40,15 +44,32 @@ var Game = {
       function(evt) {
         this.clickX = evt.clientX;
         this.clickY = evt.clientY;
+
+        this.arrGnomos.forEach(
+          function(nomo, i) {
+            if (
+              this.clickX >= nomo.x &&
+              this.clickX <= nomo.x + nomo.size &&
+              this.clickY >= nomo.y &&
+              this.clickY <= nomo.y + nomo.size
+            ) {
+              console.log(`Nomo en la posición ${i} del array.`);
+            }
+          }.bind(this)
+        );
       }.bind(this)
     );
     //   false
   },
   //generamos nuevos gnomos
   generateGnomos: function() {
-    var x = Math.floor(Math.random() * (1350 - 0 + 1) + 0);
-    var y = Math.floor(Math.random() * (680 - 375 + 1) + 375);
-    this.arrGnomos.push(new Gnomo(this, x, y));
+    //todo: consider refactoring hardcoded variables
+    if (this.contGnomos < this.maxGnomos) {
+      var x = Math.floor(Math.random() * (1350 - 0 + 1) + 0);
+      var y = Math.floor(Math.random() * (680 - 375 + 1) + 375);
+      this.arrGnomos.push(new Gnomo(this, x, y));
+      this.contGnomos++;
+    }
   },
   // clear: function() {}
   //dibuja todos los assets del juego
@@ -65,8 +86,6 @@ var Game = {
     this.background = new Background(this);
     this.framesCounter = 0;
     this.arrGnomos = [];
+    this.contGnomos = 0;
   }
-  ////////////////////////////
-  ////////////////////////////
-  /////////////////////////////
 };
