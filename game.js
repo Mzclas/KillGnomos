@@ -2,15 +2,21 @@ var Game = {
   canvas: undefined,
   ctx: undefined,
   fps: 60,
+  scoreBoard: undefined,
+  stagelvl: undefined,
+
   startGame: function(canvasId) {
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext("2d");
     this.click();
     this.fps = 60;
-    this.reset();
-    this.start();
     this.contGnomos = 0;
     this.maxGnomos = 10;
+    this.initialSpeed = 40;
+    this.speedGnomes = this.initialSpeed;
+    this.deadGnomos = 0;
+    this.reset();
+    this.start();
   },
   start: function() {
     this.clickX = undefined;
@@ -20,20 +26,29 @@ var Game = {
     this.ugeInterval = setInterval(
       function() {
         this.clear();
+        console.log(
+          this.maxGnomos,
+          this.deadGnomos,
+          this.contGnomos,
+          this.speedGnomes
+        );
         this.framesCounter++;
-        if (this.framesCounter > 1000) {
+        if (this.framesCounter > 100000) {
           this.framesCounter = 0;
         }
-        if (this.framesCounter % 100 === 0) {
+        if (this.framesCounter % this.speedGnomes === 0) {
           this.generateGnomos();
         }
+        if (this.arrGnomos.length >= 10) {
+          this.gameOver();
+        }
+        if (this.deadGnomos === this.maxGnomos) {
+          this.stage++;
+          this.stop();
+          this.lvlcomplet();
+        }
+        this.move();
         this.drawAll();
-        // borre
-        // cree gnomos cada cierto tiempo ,  this.gnomos.push(new Gnomo (this))
-        // mueva los elementos si se mueven
-        // pinte
-        // recoja si hay click de raton
-        // elimine gnomos destruidos.
       }.bind(this),
       1000 / this.fps
     );
@@ -46,24 +61,23 @@ var Game = {
         this.clickY = evt.clientY;
 
         this.arrGnomos.forEach(
-          function(nomo, i) {
+          function(gnomo, i) {
             if (
-              this.clickX >= nomo.x &&
-              this.clickX <= nomo.x + nomo.size &&
-              this.clickY >= nomo.y &&
-              this.clickY <= nomo.y + nomo.size
+              this.clickX >= gnomo.x &&
+              this.clickX <= gnomo.x + gnomo.size &&
+              this.clickY >= gnomo.y &&
+              this.clickY <= gnomo.y + gnomo.size
             ) {
-              console.log(`Nomo en la posición ${i} del array.`);
+              this.score++;
+              this.arrGnomos.splice(i, 1);
+              this.deadGnomos++;
             }
           }.bind(this)
         );
       }.bind(this)
     );
-    //   false
   },
-  //generamos nuevos gnomos
   generateGnomos: function() {
-    //todo: consider refactoring hardcoded variables
     if (this.contGnomos < this.maxGnomos) {
       var x = Math.floor(Math.random() * (1350 - 0 + 1) + 0);
       var y = Math.floor(Math.random() * (680 - 375 + 1) + 375);
@@ -71,8 +85,6 @@ var Game = {
       this.contGnomos++;
     }
   },
-  // clear: function() {}
-  //dibuja todos los assets del juego
   clear: function() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   },
@@ -81,11 +93,45 @@ var Game = {
     this.arrGnomos.forEach(function(gnomo) {
       gnomo.drawGnomo();
     });
+    this.fog.fogDraw();
+    this.drawScore();
+    this.drawStage();
+  },
+  move: function() {
+    this.fog.move();
   },
   reset: function() {
     this.background = new Background(this);
+    this.fog = new Fog(this);
     this.framesCounter = 0;
     this.arrGnomos = [];
     this.contGnomos = 0;
+    this.scoreBoard = ScoreBoard;
+    this.stagelvl = Stagelvl;
+    this.score = 0;
+    this.stage = 1;
+    this.speedGnomes = this.initialSpeed;
+  },
+  stop: function() {
+    clearInterval(this.ugeInterval);
+  },
+  lvlcomplet: function() {
+    this.maxGnomos *= 2;
+    this.speedGnomes -= 4;
+    this.deadGnomos = 0;
+    this.contGnomos = 0;
+    this.start();
+  },
+
+  gameOver: function() {
+    this.stop();
+    this.reset();
+    this.start();
+  },
+  drawScore: function() {
+    this.scoreBoard.update(this.score, this.ctx);
+  },
+  drawStage: function() {
+    this.stagelvl.update(this.stage, this.ctx);
   }
 };
