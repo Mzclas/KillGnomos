@@ -1,3 +1,7 @@
 window.onload = function() {
-  Game.startGame("myCanvas");
+  Game.init("myCanvas");
+  Game.showIntro(function() {
+    Game.reset();
+    Game.start();
+  });
 };

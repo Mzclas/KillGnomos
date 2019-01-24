@@ -1,6 +1,9 @@
 canvas {
-  cursor: crosshair;
+  cursor: url("./imgs/sniper-reticle.png"), crosshair;
 }
+html,
 body {
+  overflow: hidden;
   margin: 0;
+  padding: 0;
 }

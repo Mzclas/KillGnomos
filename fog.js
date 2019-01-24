@@ -15,21 +15,23 @@ function Fog(game) {
   this.dx = 2;
 }
 
-Fog.prototype.fogDraw = function() {
-  this.game.ctx.drawImage(
-    this.img,
-    this.x,
-    this.y,
-    this.game.canvas.width,
-    this.game.canvas.height
-  );
-  this.game.ctx.drawImage(
-    this.imgMirrored,
-    this.x + this.game.canvas.width,
-    this.y,
-    this.game.canvas.width,
-    this.game.canvas.height
-  );
+Fog.prototype.fogDraw = function(intensity) {
+  for (var i = 0; i < intensity; ++i) {
+    this.game.ctx.drawImage(
+      this.img,
+      this.x,
+      this.y,
+      this.game.canvas.width,
+      this.game.canvas.height
+    );
+    this.game.ctx.drawImage(
+      this.imgMirrored,
+      this.x + this.game.canvas.width,
+      this.y,
+      this.game.canvas.width,
+      this.game.canvas.height
+    );
+  }
 };
 
 Fog.prototype.move = function() {
